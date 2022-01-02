@@ -1,0 +1,798 @@
+<html>
+<head>
+  <title>Music Decay Calculator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+  <style>
+    #snackbar {
+      visibility: hidden;
+      min-width: 250px;
+      margin-left: -125px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 2px;
+      padding: 16px;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      bottom: 30px;
+      font-size: 17px;
+    }
+    
+    #snackbar.show {
+      visibility: visible;
+      -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    
+    @-webkit-keyframes fadein {
+      from {bottom: 0; opacity: 0;} 
+      to {bottom: 30px; opacity: 1;}
+    }
+    
+    @keyframes fadein {
+      from {bottom: 0; opacity: 0;}
+      to {bottom: 30px; opacity: 1;}
+    }
+    
+    @-webkit-keyframes fadeout {
+      from {bottom: 30px; opacity: 1;} 
+      to {bottom: 0; opacity: 0;}
+    }
+    
+    @keyframes fadeout {
+      from {bottom: 30px; opacity: 1;}
+      to {bottom: 0; opacity: 0;}
+    }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <center><h1>Music Decay Calculator</h1></center>
+    <div class="input-group d-flex p-2">
+      <input type="number" class="form-control" placeholder="Beats Per Minute Input" aria-label="Beats Per Minute Input" value="120" id="bpm">
+      <button class="btn btn-outline-secondary" type="button" id="calcbtn" onclick="calcbtn()">Reverb</button>
+      <button class="btn btn-outline-secondary" type="button" id="decaybtn" onclick="decaycalc()">Decay</button>
+    </div>
+    <div class="d-grid gap-2 p-2">
+      <button class="btn btn-outline-dark" type="button" onclick="taptap()">Tap Tempo</button>
+    </div>
+    <div class="input-group d-flex p-2">
+      <input type="text" aria-label="First name" class="form-control" placeholder="Position" id="simple-position" >
+      <input type="text" aria-label="Last name" class="form-control" placeholder="Elapsed time:" id="simple-time">
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Normal</th>
+          <th scope="col">Dotted</th>
+          <th scope="col">Triplet</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">
+            <input class="form-check-input" type="radio" name="bars" id="bars1">
+            <label class="form-check-label" for="bars" id="bar1">1</label>
+          </th>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="nor1">
+            <label class="form-check-label" for="reverb" id="normal1">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="dot1">
+            <label class="form-check-label" for="reverb" id="dotted1">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="tri1">
+            <label class="form-check-label" for="reverb" id="triplet1">Default</label>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <input class="form-check-input" type="radio" name="bars" id="bars2">
+            <label class="form-check-label" for="bars" id="bar2"><sup>1</sup>&frasl;<sub>2</sub></label>
+          </th>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="nor2">
+            <label class="form-check-label" for="reverb" id="normal2">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="dot2">
+            <label class="form-check-label" for="reverb" id="dotted2">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="tri2">
+            <label class="form-check-label" for="reverb" id="triplet2">Default</label>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <input class="form-check-input" type="radio" name="bars" id="bars3">
+            <label class="form-check-label" for="bars" id="bar3"><sup>1</sup>&frasl;<sub>4</sub></label>
+          </th>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="nor3">
+            <label class="form-check-label" for="reverb" id="normal3">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="dot3">
+            <label class="form-check-label" for="reverb" id="dotted3">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="tri3">
+            <label class="form-check-label" for="reverb" id="triplet3">Default</label>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <input class="form-check-input" type="radio" name="bars" id="bars4">
+            <label class="form-check-label" for="bars" id="bar4"><sup>1</sup>&frasl;<sub>8</sub></label>
+          </th>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="nor4">
+            <label class="form-check-label" for="reverb" id="normal4">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="dot4">
+            <label class="form-check-label" for="reverb" id="dotted4">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="tri4">
+            <label class="form-check-label" for="reverb" id="triplet4">Default</label>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <input class="form-check-input" type="radio" name="bars" id="bars5">
+            <label class="form-check-label" for="bars" id="bar5"><sup>1</sup>&frasl;<sub>16</sub></label>
+          </th>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="nor5">
+            <label class="form-check-label" for="reverb" id="normal5">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="dot5">
+            <label class="form-check-label" for="reverb" id="dotted5">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="tri5">
+            <label class="form-check-label" for="reverb" id="triplet5">Default</label>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <input class="form-check-input" type="radio" name="bars" id="bars6">
+            <label class="form-check-label" for="bars" id="bar6"><sup>1</sup>&frasl;<sub>32</sub></label>
+          </th>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="nor6">
+            <label class="form-check-label" for="reverb" id="normal6">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="dot6">
+            <label class="form-check-label" for="reverb" id="dotted6">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="tri6">
+            <label class="form-check-label" for="reverb" id="triplet6">Default</label>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <input class="form-check-input" type="radio" name="bars" id="bars7">
+            <label class="form-check-label" for="bars" id="bar7"><sup>1</sup>&frasl;<sub>64</sub></label>
+          </th>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="nor7">
+            <label class="form-check-label" for="reverb" id="normal7">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="dot7">
+            <label class="form-check-label" for="reverb" id="dotted7">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="tri7">
+            <label class="form-check-label" for="reverb" id="triplet7">Default</label>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">
+            <input class="form-check-input" type="radio" name="bars" id="bars8">
+            <label class="form-check-label" for="bars" id="bar8"><sup>1</sup>&frasl;<sub>128</sub></label>
+          </th>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="nor8">
+            <label class="form-check-label" for="reverb" id="normal8">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="dot8">
+            <label class="form-check-label" for="reverb" id="dotted8">Default</label>
+          </td>
+          <td>
+            <input class="form-check-input" type="radio" name="reverb" id="tri8">
+            <label class="form-check-label" for="reverb" id="triplet8">Default</label>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="input-group mb-3 d-flex p-2">
+      <input type="text" class="form-control" placeholder="Decay" aria-label="Decay" aria-describedby="button-addon2" id="decay">
+      <button class="btn btn-outline-secondary" type="button" id="copybtn" onclick="copyText()">Copy</button>
+    </div>
+    <div id="snackbar">Some text some message..</div>
+  </div>
+</body>
+</html>
+
+<script>
+  //Default Fn
+  $( document ).ready(function() {
+    calcbtn();
+  });
+  
+  //Copy Function
+  function copyText() {
+    var copyText = document.getElementById("decay");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); 
+    navigator.clipboard.writeText(copyText.value);
+    //alert("Copied the text: " + copyText.value);
+    var x = document.getElementById("snackbar");
+    x.innerHTML = "Copied the text: " + copyText.value;
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+  }
+  
+  //Reverb Calculation Logic
+  function calcbtn() {
+    var bpm = document.getElementById("bpm").value;
+    var normal_value_1 = 240000/bpm;
+    var dotted_value_1 = 360000/bpm;
+    var triplet_value_1 = 160000/bpm;
+    document.getElementById("normal1").innerHTML = normal_value_1;
+    document.getElementById("dotted1").innerHTML = dotted_value_1;
+    document.getElementById("triplet1").innerHTML = triplet_value_1;
+    
+    document.getElementById("normal2").innerHTML = document.getElementById("normal1").innerHTML/2;
+    document.getElementById("dotted2").innerHTML = document.getElementById("dotted1").innerHTML/2;
+    document.getElementById("triplet2").innerHTML = document.getElementById("triplet1").innerHTML/2;
+    
+    document.getElementById("normal3").innerHTML = document.getElementById("normal2").innerHTML/2;
+    document.getElementById("dotted3").innerHTML = document.getElementById("dotted2").innerHTML/2;
+    document.getElementById("triplet3").innerHTML = document.getElementById("triplet2").innerHTML/2;
+    
+    document.getElementById("normal4").innerHTML = document.getElementById("normal3").innerHTML/2;
+    document.getElementById("dotted4").innerHTML = document.getElementById("dotted3").innerHTML/2;
+    document.getElementById("triplet4").innerHTML = document.getElementById("triplet3").innerHTML/2;
+    
+    document.getElementById("normal5").innerHTML = document.getElementById("normal4").innerHTML/2;
+    document.getElementById("dotted5").innerHTML = document.getElementById("dotted4").innerHTML/2;
+    document.getElementById("triplet5").innerHTML = document.getElementById("triplet4").innerHTML/2;
+    
+    document.getElementById("normal6").innerHTML = document.getElementById("normal5").innerHTML/2;
+    document.getElementById("dotted6").innerHTML = document.getElementById("dotted5").innerHTML/2;
+    document.getElementById("triplet6").innerHTML = document.getElementById("triplet5").innerHTML/2;
+    
+    document.getElementById("normal7").innerHTML = document.getElementById("normal6").innerHTML/2;
+    document.getElementById("dotted7").innerHTML = document.getElementById("dotted6").innerHTML/2;
+    document.getElementById("triplet7").innerHTML = document.getElementById("triplet6").innerHTML/2;
+    
+    document.getElementById("normal8").innerHTML = document.getElementById("normal7").innerHTML/2;
+    document.getElementById("dotted8").innerHTML = document.getElementById("dotted7").innerHTML/2;
+    document.getElementById("triplet8").innerHTML = document.getElementById("triplet7").innerHTML/2;    
+  }
+  
+  //Decay Calculation
+  function decaycalc() {   
+    //normal case 1
+    if(document.getElementById('nor1').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal1").innerHTML-document.getElementById("normal1").innerHTML;
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    }  
+    //normal case 2
+    if(document.getElementById('nor2').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal1").innerHTML-document.getElementById("normal2").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal2").innerHTML-document.getElementById("normal2").innerHTML;   
+      }   
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //normal case 3
+    if(document.getElementById('nor3').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal1").innerHTML-document.getElementById("normal3").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal2").innerHTML-document.getElementById("normal3").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal3").innerHTML-document.getElementById("normal3").innerHTML;        
+      }   
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //normal case 4
+    if(document.getElementById('nor4').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal1").innerHTML-document.getElementById("normal4").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal2").innerHTML-document.getElementById("normal4").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal3").innerHTML-document.getElementById("normal4").innerHTML;        
+      }   
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal4").innerHTML-document.getElementById("normal4").innerHTML;        
+      } 
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //normal case 5
+    if(document.getElementById('nor5').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal1").innerHTML-document.getElementById("normal5").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal2").innerHTML-document.getElementById("normal5").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal3").innerHTML-document.getElementById("normal5").innerHTML;        
+      }   
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal4").innerHTML-document.getElementById("normal5").innerHTML;        
+      } 
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal5").innerHTML-document.getElementById("normal5").innerHTML;        
+      } 
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //normal case 6
+    if(document.getElementById('nor7').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal1").innerHTML-document.getElementById("normal6").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal2").innerHTML-document.getElementById("normal6").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal3").innerHTML-document.getElementById("normal6").innerHTML;        
+      }   
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal4").innerHTML-document.getElementById("normal6").innerHTML;        
+      } 
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal5").innerHTML-document.getElementById("normal6").innerHTML;        
+      } 
+      else if(document.getElementById('bars6').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal6").innerHTML-document.getElementById("normal6").innerHTML;        
+      }  
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //normal case 7
+    if(document.getElementById('nor7').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal1").innerHTML-document.getElementById("normal7").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal2").innerHTML-document.getElementById("normal7").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal3").innerHTML-document.getElementById("normal7").innerHTML;        
+      }   
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal4").innerHTML-document.getElementById("normal7").innerHTML;        
+      } 
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal5").innerHTML-document.getElementById("normal7").innerHTML;        
+      } 
+      else if(document.getElementById('bars6').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal6").innerHTML-document.getElementById("normal7").innerHTML;        
+      } 
+      else if(document.getElementById('bars7').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal7").innerHTML-document.getElementById("normal7").innerHTML;        
+      }   
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //normal case 8
+    if(document.getElementById('nor8').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal1").innerHTML-document.getElementById("normal8").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal2").innerHTML-document.getElementById("normal8").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal3").innerHTML-document.getElementById("normal8").innerHTML;        
+      }   
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal4").innerHTML-document.getElementById("normal8").innerHTML;        
+      } 
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal5").innerHTML-document.getElementById("normal8").innerHTML;        
+      } 
+      else if(document.getElementById('bars6').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal6").innerHTML-document.getElementById("normal8").innerHTML;        
+      } 
+      else if(document.getElementById('bars7').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal7").innerHTML-document.getElementById("normal8").innerHTML;        
+      }  
+      else if(document.getElementById('bars8').checked) {   
+        document.getElementById("decay").value = document.getElementById("normal8").innerHTML-document.getElementById("normal8").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //dotted case 1
+    if(document.getElementById('dot1').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted1").innerHTML-document.getElementById("dotted1").innerHTML;
+      }   
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //dotted case 2
+    if(document.getElementById('dot2').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted1").innerHTML-document.getElementById("dotted2").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted2").innerHTML-document.getElementById("dotted2").innerHTML;   
+      }   
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //dotted case 3
+    if(document.getElementById('dot3').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted1").innerHTML-document.getElementById("dotted3").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted2").innerHTML-document.getElementById("dotted3").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted3").innerHTML-document.getElementById("dotted3").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //dotted case 4
+    if(document.getElementById('dot4').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted1").innerHTML-document.getElementById("dotted4").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted2").innerHTML-document.getElementById("dotted4").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted3").innerHTML-document.getElementById("dotted4").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted4").innerHTML-document.getElementById("dotted4").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //dotted case 5
+    if(document.getElementById('dot5').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted1").innerHTML-document.getElementById("dotted5").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted2").innerHTML-document.getElementById("dotted5").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted3").innerHTML-document.getElementById("dotted5").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted4").innerHTML-document.getElementById("dotted5").innerHTML;        
+      }
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted5").innerHTML-document.getElementById("dotted5").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //dotted case 6
+    if(document.getElementById('dot6').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted1").innerHTML-document.getElementById("dotted6").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted2").innerHTML-document.getElementById("dotted6").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted3").innerHTML-document.getElementById("dotted6").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted4").innerHTML-document.getElementById("dotted6").innerHTML;        
+      }
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted5").innerHTML-document.getElementById("dotted6").innerHTML;        
+      }
+      else if(document.getElementById('bars6').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted6").innerHTML-document.getElementById("dotted6").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //dotted case 7
+    if(document.getElementById('dot7').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted1").innerHTML-document.getElementById("dotted7").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted2").innerHTML-document.getElementById("dotted7").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted3").innerHTML-document.getElementById("dotted7").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted4").innerHTML-document.getElementById("dotted7").innerHTML;        
+      }
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted5").innerHTML-document.getElementById("dotted7").innerHTML;        
+      }
+      else if(document.getElementById('bars6').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted6").innerHTML-document.getElementById("dotted7").innerHTML;        
+      }
+      else if(document.getElementById('bars7').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted7").innerHTML-document.getElementById("dotted7").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //dotted case 8
+    if(document.getElementById('dot8').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted1").innerHTML-document.getElementById("dotted8").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted2").innerHTML-document.getElementById("dotted8").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted3").innerHTML-document.getElementById("dotted8").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted4").innerHTML-document.getElementById("dotted8").innerHTML;        
+      }
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted5").innerHTML-document.getElementById("dotted8").innerHTML;        
+      }
+      else if(document.getElementById('bars6').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted6").innerHTML-document.getElementById("dotted8").innerHTML;        
+      }
+      else if(document.getElementById('bars7').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted7").innerHTML-document.getElementById("dotted8").innerHTML;        
+      }
+      else if(document.getElementById('bars8').checked) {   
+        document.getElementById("decay").value = document.getElementById("dotted8").innerHTML-document.getElementById("dotted8").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //triplet case 1
+    if(document.getElementById('tri1').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet1").innerHTML-document.getElementById("triplet1").innerHTML;
+      }   
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //triplet case 2
+    if(document.getElementById('tri2').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet1").innerHTML-document.getElementById("triplet2").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet2").innerHTML-document.getElementById("triplet2").innerHTML;   
+      }   
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //triplet case 3
+    if(document.getElementById('tri3').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet1").innerHTML-document.getElementById("triplet3").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet2").innerHTML-document.getElementById("triplet3").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet3").innerHTML-document.getElementById("triplet3").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //triplet case 4
+    if(document.getElementById('tri4').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet1").innerHTML-document.getElementById("triplet4").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet2").innerHTML-document.getElementById("triplet4").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet3").innerHTML-document.getElementById("triplet4").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet4").innerHTML-document.getElementById("triplet4").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //triplet case 5
+    if(document.getElementById('tri5').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet1").innerHTML-document.getElementById("triplet5").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet2").innerHTML-document.getElementById("triplet5").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet3").innerHTML-document.getElementById("triplet5").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet4").innerHTML-document.getElementById("triplet5").innerHTML;        
+      }
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet5").innerHTML-document.getElementById("triplet5").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //triplet case 6
+    if(document.getElementById('tri6').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet1").innerHTML-document.getElementById("triplet6").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet2").innerHTML-document.getElementById("triplet6").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet3").innerHTML-document.getElementById("triplet6").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet4").innerHTML-document.getElementById("triplet6").innerHTML;        
+      }
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet5").innerHTML-document.getElementById("triplet6").innerHTML;        
+      }
+      else if(document.getElementById('bars6').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet6").innerHTML-document.getElementById("triplet6").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //triplet case 7
+    if(document.getElementById('tri7').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet1").innerHTML-document.getElementById("triplet7").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet2").innerHTML-document.getElementById("triplet7").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet3").innerHTML-document.getElementById("triplet7").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet4").innerHTML-document.getElementById("triplet7").innerHTML;        
+      }
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet5").innerHTML-document.getElementById("triplet7").innerHTML;        
+      }
+      else if(document.getElementById('bars6').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet6").innerHTML-document.getElementById("triplet7").innerHTML;        
+      }
+      else if(document.getElementById('bars7').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet7").innerHTML-document.getElementById("triplet7").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+    //triplet case 8
+    if(document.getElementById('tri8').checked) {   
+      if(document.getElementById('bars1').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet1").innerHTML-document.getElementById("triplet8").innerHTML;
+      }   
+      else if(document.getElementById('bars2').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet2").innerHTML-document.getElementById("triplet8").innerHTML;   
+      }   
+      else if(document.getElementById('bars3').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet3").innerHTML-document.getElementById("triplet8").innerHTML;        
+      }
+      else if(document.getElementById('bars4').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet4").innerHTML-document.getElementById("triplet8").innerHTML;        
+      }
+      else if(document.getElementById('bars5').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet5").innerHTML-document.getElementById("triplet8").innerHTML;        
+      }
+      else if(document.getElementById('bars6').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet6").innerHTML-document.getElementById("triplet8").innerHTML;        
+      }
+      else if(document.getElementById('bars7').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet7").innerHTML-document.getElementById("triplet8").innerHTML;        
+      }
+      else if(document.getElementById('bars8').checked) {   
+        document.getElementById("decay").value = document.getElementById("triplet8").innerHTML-document.getElementById("triplet8").innerHTML;        
+      }
+      else {   
+        alert("No Selection / Invalid Selection"); 
+      } 
+    } 
+  }
+</script>
+
+<script>
+  var beatTimes = [];
+  function taptap() {
+        // Add beat
+        beatTimes.push(Date.now());
+        var n = beatTimes.length;
+        //setText("simple-beats", n);
+        
+        // Coordinates for linear regression
+        var x = n - 1;
+        var y = beatTimes[n - 1] - beatTimes[0];
+        //setText("simple-time", (y / 1000).toFixed(3) + " s");
+        document.getElementById("simple-time").value = (y / 1000).toFixed(3) + " s"
+        
+        
+        var tempo = 60000 * x / y;
+        if (n < 8 || tempo < 190)
+        //setText("simple-position", "Bar " + Math.floor(x / 4) + " : Beat " + x % 4);
+        document.getElementById("simple-position").value = "Bar " + Math.floor(x / 4) + " : Beat " + x % 4;
+        else  // Two taps per beat
+        //setText("simple-position", "Bar " + Math.floor(x / 8) + " : Beat " + Math.floor(x / 2) % 4 + "." + x % 2 * 5);
+        document.getElementById("simple-position").value = "Bar " + Math.floor(x / 8) + " : Beat " + Math.floor(x / 2) % 4;
+        
+        if (n >= 2) {
+          // Period and tempo, simple
+          var period = y / x;
+          //setText("simple-tempo", tempo.toFixed(2) + " BPM");
+          document.getElementById("bpm").value = tempo.toFixed(2);
+          //setText("simple-period", period.toFixed(2) + " ms");
+        }
+      };
+  
+</script>
